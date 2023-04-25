@@ -43,4 +43,9 @@ class HealthcareType extends \yii\db\ActiveRecord
             'text' => 'Text',
         ];
     }
+
+    public function getCoding()
+    {
+        return $this->hasOne(HealthcareTypeCoding::class, ['healthcare_type_id' => 'id']);
+    }
 }

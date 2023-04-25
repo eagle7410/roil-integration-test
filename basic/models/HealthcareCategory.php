@@ -27,7 +27,7 @@ class HealthcareCategory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['healthcare_category_id'], 'integer'],
+            [['healthcare_id'], 'integer'],
             [['text'], 'string', 'max' => 255],
         ];
     }
@@ -39,8 +39,12 @@ class HealthcareCategory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'healthcare_category_id' => 'Healthcare Category ID',
+            'healthcare_id' => 'Healthcare ID',
             'text' => 'Text',
         ];
+    }
+
+    public function getCoding() {
+        return $this->hasMany(HealthcareCategoryCoding::class, ['healthcare_category_id' => 'id']);
     }
 }

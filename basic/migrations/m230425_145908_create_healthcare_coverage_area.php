@@ -13,7 +13,7 @@ class m230425_145908_create_healthcare_coverage_area extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('healthcare_type_coverage_area', [
+        $this->createTable('healthcare_coverage_area', [
             'id' => Schema::TYPE_PK,
             'healthcare_id' => Schema::TYPE_INTEGER,
             'value' => Schema::TYPE_STRING,
@@ -25,6 +25,6 @@ class m230425_145908_create_healthcare_coverage_area extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('healthcare_type_coverage_area');
+        $this->dropTable('healthcare_coverage_area');
     }
 }

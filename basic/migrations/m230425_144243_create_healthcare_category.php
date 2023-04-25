@@ -15,7 +15,7 @@ class m230425_144243_create_healthcare_category extends Migration
     {
         $this->createTable('healthcare_category', [
             'id' => Schema::TYPE_PK,
-            'healthcare_category_id' => Schema::TYPE_INTEGER,
+            'healthcare_id' => Schema::TYPE_INTEGER,
             'text' => Schema::TYPE_STRING,
         ]);
     }

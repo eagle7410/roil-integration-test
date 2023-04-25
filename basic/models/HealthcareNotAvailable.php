@@ -43,4 +43,9 @@ class HealthcareNotAvailable extends \yii\db\ActiveRecord
             'description' => 'Description',
         ];
     }
+
+    public function getDuring()
+    {
+        return $this->hasOne(HealthcareNotAvailableDuring::class, ['healthcare_not_available_id' => 'id']);
+    }
 }

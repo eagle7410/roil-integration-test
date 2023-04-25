@@ -34,5 +34,29 @@ class Healthcare extends \yii\db\ActiveRecord {
 			['is_active', 'bolean'],
 		];
     }
+    
+    public function getType()
+    {
+        return $this->hasOne(HealthcareType::class, ['healthcare_id' => 'id']);
+    }
+    
+    public function getCategory()
+    {
+        return $this->hasOne(HealthcareCategory::class, ['healthcare_id' => 'id']);
+    }
 		
+    public function getCoverage_area() 
+    {
+        return $this->hasMany(HealthcareCoverageArea::class, ['healthcare_id' => 'id']);
+    }
+
+    public function getAvailable_time() 
+    {
+        return $this->hasMany(HealthcareAvailableTime::class, ['healthcare_id' => 'id']);
+    }
+
+    public function getNot_available() 
+    {
+        return $this->hasMany(HealthcareNotAvailable::class, ['healthcare_id' => 'id']);
+    }
 }

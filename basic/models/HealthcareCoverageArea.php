@@ -11,14 +11,14 @@ use Yii;
  * @property int|null $healthcare_id
  * @property string|null $value
  */
-class HealthcareTypeCoverageArea extends \yii\db\ActiveRecord
+class HealthcareCoverageArea extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'healthcare_type_coverage_area';
+        return 'healthcare_coverage_area';
     }
 
     /**
