@@ -19,6 +19,7 @@ class m230425_150915_create_healthcare_available_time extends Migration
             'available_start_time' => 'varchar(8)',
             'available_end_time' => 'varchar(8)',
             'days_of_week' => Schema::TYPE_STRING,
+            'all_day' => Schema::TYPE_BOOLEAN,
         ]);
     }
 

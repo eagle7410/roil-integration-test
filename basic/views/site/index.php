@@ -2,6 +2,7 @@
 
 /** @var yii\web\View $this */
 use yii\helpers\Html;
+use yii\helpers\Url;
 use janisto\timepicker\TimePickerAsset;
 
 TimePickerAsset::register($this);
@@ -17,11 +18,12 @@ $this->registerJsFile(
    
     <div class="body-content">
 
-        <noscript class="alert-danger alert">
+        <noscript class="alert-danger alert ">
             Для коректної праці сайту требо щоб працював Javascript.
         </noscript>
+        <div class="alert-danger alert " style="display:none" id="errors"></div>
         <div class="form-group">
-            <?= Html::beginForm('order/update', 'post', [ 'id' => 'formCreate']) ?>
+            <?= Html::beginForm(Url::toRoute('healthcare-service/create'), 'post', [ 'id' => 'formCreate']) ?>
                 <div class='form-group required'>
                     <?= Html::label('Індифікатор відділення', 'division_id',  ['class' => 'control-label']) ?>
                     <?= Html::input('text', 'division_id', '', [
@@ -109,5 +111,6 @@ $this->registerJsFile(
 
             <?= Html::endForm() ?>
         </div>
+        <pre class="alert alert-secondary" id="result">Result:</pre>
     </div>
 </div>

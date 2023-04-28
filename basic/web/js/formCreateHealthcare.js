@@ -4,10 +4,6 @@ var countCoverageArea = 0;
 var countAvalibleTime = 0;
 var countNotAvalible = 0;
 
-function getInputHtml (id, label, name) {
-	if (!name) name = id;
-	return "<div class=\"form-group\"><label for= " + id + ">" + label + "</label ><input type='text' class='form-control' id='" + id + "' name='" + name +"' value=''></div>";
-}
 
 $(document).ready(function(){
 	var dayOfWeek = '<div class="form-group"><div>';
@@ -87,108 +83,198 @@ $(document).ready(function(){
 		
 		countNotAvalible++;
 	});
+
+	var $errors = $('#errors');
 	
 	$('#send').click(function(ev){
-		ev.preventDefault();
+		var $btnSend = $(this);
+		$btnSend.prop('disabled', true);
 
-		var data = $('#formCreate').serializeArray();
+		ev.preventDefault();
+		var $form = $('#formCreate');
+		var data = $form.serializeArray();
 		var sendData = { 
 			category: { coding: [] }, 
 		};
 
 		var objCollect = {};
+		var isValid = true;
 		var name;
 
-		$.each(data, function (i, item) {
-			
-			if (item.name === '_csrf') sendData._csrf = item.value;
-			if (item.name === 'division_id' && item.value.length) sendData.division_id = item.value;
-			if (item.name === 'speciality_type' && item.value.length) sendData.speciality_type = item.value;
-			if (item.name === 'providing_condition' && item.value.length) sendData.providing_condition = item.value;
-			if (item.name === 'license_id' && item.value.length) sendData.license_id = item.value;
-			if (item.name === 'categoryText' && item.value.length) sendData.category.text = item.value;
-			if (item.name === 'comment' && item.value.length) sendData.comment = item.value;
-			if (item.name == 'typeText') {
-				if (!sendData.type) sendData.type = {};
-				if (item.value.length) sendData.type.text = item.value;
-			}
+		$errors.hide();
+		
+		try {
+			$.each(data, function (i, item) {
 
-			if (item.name.substr(-2) == '[]' ) {
-				name = item.name.substr(0, item.name.length - 2);
-
-				if (name == 'duringEnd') {
-					// TODO Need try catch for corrent value and check all values
-
-					objCollect.during.end = (new Date(Date.parse(item.value))).toISOString();
-					if (!sendData.not_avalible) sendData.not_avalible = [];
-
-					sendData.not_avalible.push(objCollect);
-					objCollect = {};
+				if (item.name === '_csrf') sendData._csrf = item.value;
+				if (item.name === 'division_id' && item.value.length) sendData.division_id = item.value;
+				if (item.name === 'speciality_type' && item.value.length) sendData.speciality_type = item.value;
+				if (item.name === 'providing_condition' && item.value.length) sendData.providing_condition = item.value;
+				if (item.name === 'license_id' && item.value.length) sendData.license_id = item.value;
+				if (item.name === 'categoryText' && item.value.length) sendData.category.text = item.value;
+				if (item.name === 'comment' && item.value.length) sendData.comment = item.value;
+				if (item.name == 'typeText') {
+					if (!sendData.type) sendData.type = {};
+					if (item.value.length) sendData.type.text = item.value;
 				}
 
-				if (name == 'duringStart') {
-					// TODO Need try catch for corrent value
-					objCollect.during = { start: (new Date(Date.parse(item.value))).toISOString() };
-				}
+				if (item.name.substr(-2) == '[]') {
+					name = item.name.substr(0, item.name.length - 2);
 
-				if (name == 'description') {
-					objCollect.description = item.value;
-				}
+					if (name == 'duringEnd') {
 
-				if (name == 'avalibleEnd') {
-					if (item.value.length) objCollect.available_end_time = item.value;
-					if (!sendData.avalible_time) sendData.avalible_time = [];
-					sendData.avalible_time.push(objCollect);
-					objCollect = {};
-				}
+						var arrError = [];
 
-				if (name == 'avalibleStart' && item.value.length) {
-					objCollect.available_start_time = item.value;
-				}
+						if (!objCollect.during) {
+							arrError.push('[Not avalible] During start is required!!!');
+						}
 
-				if (name == 'all_day') {
-					objCollect.all_day = item.value === 'on'
-				}
+						try {
+							objCollect.during.end = (new Date(Date.parse(item.value))).toISOString();
+						} catch {
+							isValid = false;
+							return showError(['[Not avalible]During end incorrect']);
+						}
+						
+						if (!objCollect.description || !objCollect.description.length)
+							arrError.push('[Not avalible] Description is required!!!');
 
-				if (name == 'days_of_week') {
-					if (!objCollect.days_of_week) objCollect.days_of_week = [];
-					objCollect.days_of_week.push(item.value)
-				}
+						if (objCollect.during !== undefined && objCollect.during.start.localeCompare(objCollect.during.end) !== -1)
+							arrError.push('[Not avalible] Range from ' + objCollect.during.start + ' to ' + objCollect.during.end +' incorrect!!!');
 
-				if (name == 'coverageArea') {
-					if (!sendData.caverage_area) sendData.caverage_area = [];
-					sendData.caverage_area.push(item.value);
-				}
+						if (arrError.length > 0) {
+							isValid = false;
+							return showError(arrError);
+						}
 
-				if (name == 'typeSystem') {
-					if (item.value.length) objCollect.system = item.value;
+						if (!sendData.not_avalible) sendData.not_avalible = [];
+						
+						sendData.not_avalible.push(objCollect);
+						objCollect = {};
+					}
+
+					if (name == 'duringStart') {
+						try {
+							objCollect.during = { start: (new Date(Date.parse(item.value))).toISOString() };
+						} catch {
+							isValid = false;
+							return showError(['[Not avalible]During start not incorrect']);
+						}
+					}
+
+					if (name == 'description') {
+						objCollect.description = item.value;
+					}
+
+					if (name == 'avalibleEnd') {
+						if (item.value.length) objCollect.available_end_time = item.value;
+						if (!objCollect.days_of_week) {
+							isValid = false;
+							return showError(['[Avalible time] Days of week is required!!!']);
+						}
+						
+						if (objCollect.available_end_time !== undefined && objCollect.available_start_time !== undefined && objCollect.available_start_time.localeCompare(objCollect.available_end_time) !== -1 ) {
+							isValid = false;
+							return showError(['[Avalible time] Range from '+objCollect.available_start_time +' to '+objCollect.available_end_time+' incorrect!!!']);
+						}
+
+						if (!sendData.avalible_time) sendData.avalible_time = [];
+						sendData.avalible_time.push(objCollect);
+						objCollect = {};
+					}
+
+					if (name === 'avalibleStart' && item.value.length) {
+						objCollect.available_start_time = item.value;
+					}
+
+					if (name === 'all_day') {
+						objCollect.all_day = item.value === 'on'
+					}
+
+					if (name === 'days_of_week') {
+						if (!objCollect.days_of_week) objCollect.days_of_week = [];
+						objCollect.days_of_week.push(item.value)
+					}
+
+					if (name === 'coverageArea') {
+						if (!sendData.coverage_area) sendData.coverage_area = [];
+						sendData.coverage_area.push(item.value);
+					}
+
+					if (name === 'typeSystem') {
+						if (item.value.length) objCollect.system = item.value;
+					}
+
+					if (name === 'typeCode') {
+						if (!sendData.type) sendData.type = {}
+						if (!sendData.type.coding) sendData.type.coding = [];
+						if (item.value.length) objCollect.code = item.value;
+						sendData.type.coding.push(objCollect);
+						objCollect = {};
+					}
+
+					if (name === 'categorySystem') {
+						if (item.value.length) objCollect.system = item.value;
+					}
+
+					if (name === 'categoryCode') {
+						if (item.value.length) objCollect.code = item.value;
+						sendData.category.coding.push(objCollect);
+						objCollect = {};
+					}
 				}
+			});
+
+			if (!sendData.division_id || !sendData.division_id.length)
+				return showError(['Division id is required!!!']);
+			if ((!sendData.category.text || !sendData.category.text.length) && !sendData.category.coding.length)
+				return showError(['Category is required!!!'])
+
+			if (!isValid) return false;
+
+			$.ajax({
+				method: "POST",
+				url: $form.prop('action'),
+				dataType: "json",
+				data: sendData
+			}).done(function (responce) {
+
+				if (responce.errors) 
+					return showError(responce.errors);
+
+				$('#result').html(JSON.stringify(responce, null, "\t"));
+
+				$('.removeCoverageArea').each(function(){$(this).click();});
+				$('.moveParent').each(function(){$(this).click();});
+				$form[0].reset();
 				
-				if (name == 'typeCode') {
-					if (!sendData.type) sendData.type = {}
-					if (!sendData.type.coding) sendData.type.coding = [];
-					if (item.value.length) objCollect.code = item.value;
-					sendData.type.coding.push(objCollect);
-					objCollect = {};
-				}
+			}).fail(function (responce) {
+				console.log('Responce error: ', responce);
+				alert('Has server error. Call to support.');
+			});
 
-				if (name == 'categorySystem') {
-					if(item.value.length) objCollect.system = item.value;
-				}
+			function showError(messageObject) {
+				$errors.html(JSON.stringify(messageObject));
+				$errors.show();
+				$(window).scrollTop(0);
 
-				if (name == 'categoryCode') {
-					if (item.value.length)  objCollect.code = item.value;
-					sendData.category.coding.push(objCollect);
-					objCollect = {};
-				}
+				return false;
 			}
-		});
-
-		console.log(data);
-		console.log(sendData);
+		} catch (err) {
+			console.error(err);
+			alert('Has system error. Call to support.');
+		} finally {
+			$btnSend.prop('disabled', false);
+		}
+		
 	});
 
 	function getCheckDayHtml(val, label) {
 		return '<label><input type="checkbox" name="days_of_week[]" value="' + val + '"> ' + label + ' </label>'
 	};
 })
+
+function getInputHtml(id, label, name) {
+	if (!name) name = id;
+	return "<div class=\"form-group\"><label for= " + id + ">" + label + "</label ><input type='text' class='form-control' id='" + id + "' name='" + name + "' value=''></div>";
+}

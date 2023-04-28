@@ -1,5 +1,4 @@
-    <?php
-
+<?php
 namespace app\models;
 
 use Yii;
@@ -32,7 +31,18 @@ class HealthcareAvailableTime extends \yii\db\ActiveRecord
             [['healthcare_id'], 'integer'],
             [['available_start_time', 'available_end_time'], 'string', 'max' => 8],
             [['days_of_week'], 'string', 'max' => 255],
+            [['days_of_week'], 'required',  'message'=>'Please enter a value for {attribute}.'],
+            [['all_day'], 'boolean'],
+            [['available_start_time', 'available_end_time'],'match','pattern'=>'/^(\d\d)\:(\d\d)\:(\d\d)$/'],
+            [['available_start_time'], 'validateRange'],
         ];
+    }
+
+    public function validateRange()
+    {
+        if (!is_null($this->available_start_time) && !is_null($this->available_end_time) && !($this->available_start_time < $this->available_end_time)) {
+            $this->addError('Available start time', 'Incorrect time range from '.$this->available_start_time.' to '.$this->available_end_time);
+        }
     }
 
     /**
@@ -47,5 +57,10 @@ class HealthcareAvailableTime extends \yii\db\ActiveRecord
             'available_end_time' => 'Available End Time',
             'days_of_week' => 'Days Of Week',
         ];
+    }
+   
+    public function getDaysOfWeek()
+    {
+        return  explode(',', $this->days_of_week);
     }
 }

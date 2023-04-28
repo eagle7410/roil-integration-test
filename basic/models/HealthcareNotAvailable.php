@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property int|null $healthcare_id
  * @property string|null $description
+ * @property string $start
+ * @property string|null $end
  */
 class HealthcareNotAvailable extends \yii\db\ActiveRecord
 {
@@ -29,7 +31,17 @@ class HealthcareNotAvailable extends \yii\db\ActiveRecord
         return [
             [['healthcare_id'], 'integer'],
             [['description'], 'string', 'max' => 255],
+            [['start', 'end', 'description'], 'required', 'message'=>'[Not avalible] Please enter a value for {attribute}.'],
+            [['start', 'end'],'match','pattern'=>'/^(\d\d\d\d)\-(\d\d)\-(\d\d)T(\d\d):(\d\d)\:(\d\d)\.(\d\d\d)Z$/', 'on' => 'created'],
+            [['start'], 'validateRange'],
         ];
+    }
+
+    public function validateRange()
+    {
+        if (!($this->start < $this->end)) {
+            $this->addError('During start', '[Not Available] Incorrect time range from '.gmdate("Y-m-d\TH:i:s\Z", $this->start).' to '.gmdate("Y-m-d\TH:i:s\Z", $this->end));
+        }
     }
 
     /**

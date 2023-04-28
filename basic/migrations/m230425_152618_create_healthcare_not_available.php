@@ -17,6 +17,8 @@ class m230425_152618_create_healthcare_not_available extends Migration
             'id' => Schema::TYPE_PK,
             'healthcare_id' => Schema::TYPE_INTEGER,
             'description' => Schema::TYPE_STRING,
+            'start' => Schema::TYPE_TIMESTAMP . " NOT NULL",
+            'end' => Schema::TYPE_TIMESTAMP. " NOT NULL",
         ]);
     }
 
